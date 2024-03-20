@@ -8,5 +8,5 @@
 package com.laboratory.laboratory.util;
 
 public enum UserRole {
-    USER, ADMIN
+    USER, ADMIN, STAFF
 }

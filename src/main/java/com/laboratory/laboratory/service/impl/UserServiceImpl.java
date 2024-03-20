@@ -40,15 +40,17 @@ public class UserServiceImpl implements UserService {
     public User updateUser(String id, User user) {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser != null) {
-            existingUser.setEmail(user.getEmail());
+            existingUser.setFirstname(user.getFirstname());
+            existingUser.setMiddlename(user.getMiddlename());
+            existingUser.setLastname(user.getLastname());
+            existingUser.setUsername(user.getUsername());
             existingUser.setPassword(user.getPassword());
             existingUser.setRole(user.getRole());
-            existingUser.setFirstName(user.getFirstName());
-            existingUser.setLastName(user.getLastName());
             // Set other fields as needed
             return userRepository.save(existingUser);
+        } else {
+            return null; // or throw an exception if the user with given id is not found
         }
-        return null; // or throw an exception if the user with given id is not found
     }
 
     @Override
