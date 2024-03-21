@@ -7,11 +7,15 @@
 
 package com.laboratory.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laboratory.model.bean.ResponseBean;
 import com.laboratory.model.entity.Client;
 import com.laboratory.model.entity.User;
 import com.laboratory.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,20 +23,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class ClientController {
 
+    ResponseBean responseBean = new ResponseBean();
     @Autowired
     private ClientService clientService;
 
-    ResponseBean responseBean = new ResponseBean();
-
     @PostMapping("/client/register")
-    public ResponseBean registerClient(@RequestBody Client client) {
+    public ResponseBean registerClient(@RequestBody JsonNode requestData) {
         try {
-            Client registerClient = clientService.registerClient(client);
-            if (registerClient != null) {
-                responseBean.setContent(registerClient);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Client client = objectMapper.convertValue(requestData, Client.class);
+            Client registeredClient = clientService.registerClient(client);
+            if (registeredClient != null) {
+                responseBean.setContent(registeredClient);
                 responseBean.setResponseCode("200");
                 responseBean.setResponseMsg("Client registered successfully");
             } else {
@@ -97,7 +102,7 @@ public class ClientController {
             if (clientById != null) {
                 responseBean.setContent(clientById);
                 responseBean.setResponseCode("200");
-                responseBean.setResponseMsg("Get client "+ id +" successfully");
+                responseBean.setResponseMsg("Get client " + id + " successfully");
             } else {
                 responseBean.setContent(null);
                 responseBean.setResponseCode("300");
@@ -106,7 +111,7 @@ public class ClientController {
         } catch (Exception e) {
             responseBean.setContent(null);
             responseBean.setResponseCode("500");
-            responseBean.setResponseMsg("Get client "+ id +" unsuccessfully");
+            responseBean.setResponseMsg("Get client " + id + " unsuccessfully");
         }
         return responseBean;
     }
@@ -115,7 +120,7 @@ public class ClientController {
     public ResponseBean getAllClients() {
         try {
             List<Client> allClients = clientService.getAllClients();
-            if (allClients.size() >0 ){
+            if (allClients.size() > 0) {
                 responseBean.setContent(allClients);
                 responseBean.setResponseCode("200");
                 responseBean.setResponseMsg("Get all client fetch successfully");

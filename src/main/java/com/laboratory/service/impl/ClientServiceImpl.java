@@ -63,7 +63,7 @@ public class ClientServiceImpl implements ClientService {
             existingClient.setContact(client.getContact());
             existingClient.setEmail(client.getEmail());
             existingClient.setPassword(client.getPassword());
-            existingClient.setRole("USER");
+            existingClient.setRole(client.getRole());
             existingClient.setDob(client.getDob());
             existingClient.setAddress(client.getAddress());
             // Set other fields as needed
@@ -93,5 +93,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<Client> getAllClients() {
         return clientRepository.findAll();
+    }
+
+    @Override
+    public Client getUsersByUsernameAndPassword(String email, String password) {
+        return clientRepository.findByEmailAndPassword(email, password);
     }
 }

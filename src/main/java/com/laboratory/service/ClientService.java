@@ -19,4 +19,6 @@ public interface ClientService {
     int deleteClient(String id);
     Client getClientById(String id);
     List<Client> getAllClients();
+
+    Client getUsersByUsernameAndPassword(String username, String password);
 }
