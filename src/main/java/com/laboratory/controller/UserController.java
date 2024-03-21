@@ -68,8 +68,8 @@ public class UserController {
         // Determine the redirect URL based on the user's role
         if ("admin".equals(role)) {
             return "/admin_dashboard.html"; // Redirect to admin dashboard
-        } else if ("user".equals(role)) {
-            return "/user_dashboard.html"; // Redirect to user dashboard
+        } else if ("client".equals(role)) {
+            return "/client_dashboard.html"; // Redirect to user dashboard
         } else {
             return "/login.html"; // Redirect to login page in case of unknown role
         }
