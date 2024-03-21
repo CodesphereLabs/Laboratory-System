@@ -22,7 +22,6 @@ public class TestListController {
 
     @Autowired
     private TestListService testListService;
-
     ResponseBean responseBean = new ResponseBean();
 
     @PostMapping("/test-list/create")

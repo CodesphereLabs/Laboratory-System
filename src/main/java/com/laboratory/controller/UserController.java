@@ -11,13 +11,12 @@ import com.laboratory.model.bean.ResponseBean;
 import com.laboratory.model.entity.User;
 import com.laboratory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:63342")
 @RequestMapping("/api")
 public class UserController {
 

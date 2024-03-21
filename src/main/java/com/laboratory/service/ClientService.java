@@ -16,7 +16,7 @@ public interface ClientService {
     Client loginClient(String email, String password);
     Client loginClientWithRole(String email, String password, String role); // Add method for login with role
     Client updateClient(String id, Client client); // Add updateClient method
-    void deleteClient(String id);
+    int deleteClient(String id);
     Client getClientById(String id);
     List<Client> getAllClients();
 }

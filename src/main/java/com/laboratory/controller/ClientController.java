@@ -7,7 +7,9 @@
 
 package com.laboratory.controller;
 
+import com.laboratory.model.bean.ResponseBean;
 import com.laboratory.model.entity.Client;
+import com.laboratory.model.entity.User;
 import com.laboratory.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,80 +23,112 @@ import java.util.List;
 public class ClientController {
 
     @Autowired
-    private ClientService ClientService;
+    private ClientService clientService;
 
-    @PostMapping("/Client/register")
-    public Client registerClient(@RequestBody Client client) {
-        Client client1 = new Client();
-        try {
-            client1 = ClientService.registerClient(client);
-        } catch (Exception e) {
-            throw e;
-        }
-        return client1;
-    }
+    ResponseBean responseBean = new ResponseBean();
 
-    @PostMapping("/Client/login")
-    public Client loginClient(@RequestParam String Clientname, @RequestParam String password) {
-        Client client = new Client();
+    @PostMapping("/client/register")
+    public ResponseBean registerClient(@RequestBody Client client) {
         try {
-            client = ClientService.loginClient(Clientname, password);
+            Client registerClient = clientService.registerClient(client);
+            if (registerClient != null) {
+                responseBean.setContent(registerClient);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Client registered successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Client with ID already exists in the database");
+            }
         } catch (Exception e) {
-            throw e;
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Failed to register Client");
         }
-        return client;
-    }
-
-    @PostMapping("/Client/loginWithRole")
-    public Client loginClientWithRole(@RequestParam String clientname, @RequestParam String password, @RequestParam String role) {
-        Client client = new Client();
-        try {
-            client = ClientService.loginClientWithRole(clientname, password, role);
-        } catch (Exception e) {
-            throw e;
-        }
-        return client;
+        return responseBean;
     }
 
     @PutMapping("/client/{id}")
-    public Client updateClient(@PathVariable String id, @RequestBody Client client) {
-        Client client1 = new Client();
+    public ResponseBean updateClient(@PathVariable String id, @RequestBody Client client) {
         try {
-            client1 = ClientService.updateClient(id, client);
+            Client updateClient = clientService.updateClient(id, client);
+            if (updateClient != null) {
+                responseBean.setContent(updateClient);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Client update successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Invalid Client " + id);
+            }
         } catch (Exception e) {
-            throw e;
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Client update unsuccessfully");
         }
-        return client1;
+        return responseBean;
     }
 
     @DeleteMapping("/client/{id}")
-    public void deleteClient(@PathVariable String id) {
+    public ResponseBean deleteClient(@PathVariable String id) {
         try {
-            ClientService.deleteClient(id);
+            int i = clientService.deleteClient(id);
+            if (i == 1) {
+                responseBean.setContent(id);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("User delete successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Client delete unsuccessfully");
+            }
         } catch (Exception e) {
-            throw e;
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Client delete unsuccessfully");
         }
+        return responseBean;
     }
 
     @GetMapping("/client/{id}")
-    public Client getClientById(@PathVariable String id) {
-        Client clientById = new Client();
+    public ResponseBean getClientById(@PathVariable String id) {
         try {
-            clientById = ClientService.getClientById(id);
+            Client clientById = clientService.getClientById(id);
+            if (clientById != null) {
+                responseBean.setContent(clientById);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Get client "+ id +" successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Invalid client " + id);
+            }
         } catch (Exception e) {
-            throw e;
+            responseBean.setContent(null);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Get client "+ id +" unsuccessfully");
         }
-        return clientById;
+        return responseBean;
     }
 
     @GetMapping("/clients")
-    public List<Client> getAllClients() {
-        List<Client> allClients = new ArrayList<>();
+    public ResponseBean getAllClients() {
         try {
-            allClients = ClientService.getAllClients();
+            List<Client> allClients = clientService.getAllClients();
+            if (allClients.size() >0 ){
+                responseBean.setContent(allClients);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Get all client fetch successfully");
+            } else {
+                responseBean.setContent(allClients);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("No client in the database");
+            }
         } catch (Exception e) {
-            throw e;
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Get all client fetch unsuccessfully");
         }
-        return allClients;
+        return responseBean;
     }
 }

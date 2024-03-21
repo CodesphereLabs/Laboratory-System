@@ -9,11 +9,13 @@ package com.laboratory.service.impl;
 
 import com.laboratory.Repository.ClientRepository;
 import com.laboratory.model.entity.Client;
+import com.laboratory.model.entity.User;
 import com.laboratory.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -23,7 +25,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client registerClient(Client client) {
-        return clientRepository.save(client);
+        Optional<Client> existingClient = clientRepository.findById(client.getId());
+        Client saveClient = null;
+        if (existingClient.isPresent()) {
+            System.out.println("Client with ID " + client.getId() + " already exists in the database.");
+        } else {
+            saveClient = clientRepository.save(client);
+            System.out.println("User with ID " + client.getId() + " has been added to the database.");
+        }
+        return saveClient;
     }
 
     @Override
@@ -40,8 +50,12 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client updateClient(String id, Client client) {
-        Client existingClient = clientRepository.findById(id).orElse(null);
-        if (existingClient != null) {
+
+        Optional<Client> clientOptional = clientRepository.findById(id);
+
+        if (clientOptional.isPresent()) {
+            Client existingClient = clientOptional.get();
+            // Update only the fields that are not the ID
             existingClient.setFirstname(client.getFirstname());
             existingClient.setMiddlename(client.getMiddlename());
             existingClient.setLastname(client.getLastname());
@@ -54,13 +68,21 @@ public class ClientServiceImpl implements ClientService {
             existingClient.setAddress(client.getAddress());
             // Set other fields as needed
             return clientRepository.save(existingClient);
+        } else {
+            return null; // or throw an exception if the user with the given id is not found
         }
-        return null; // or throw an exception if the user with given id is not found
     }
 
     @Override
-    public void deleteClient(String id) {
-        clientRepository.deleteById(id);
+    public int deleteClient(String id) {
+        Optional<Client> clientOptional = clientRepository.findById(id);
+
+        if (clientOptional.isPresent()) {
+            clientRepository.deleteById(id);
+            return 1; // User deleted successfully
+        } else {
+            return 0; // User does not exist, no deletion performed
+        }
     }
 
     @Override
