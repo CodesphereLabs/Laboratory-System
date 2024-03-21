@@ -16,7 +16,9 @@ public interface UserService {
     User loginUser(String email, String password);
     User loginUserWithRole(String email, String password, String role); // Add method for login with role
     User updateUser(String id, User user); // Add updateUser method
-    void deleteUser(String id);
+    int deleteUser(String id);
     User getUserById(String id);
     List<User> getAllUsers();
+
+    User getUsersByUsernameAndPassword(String username, String password);
 }

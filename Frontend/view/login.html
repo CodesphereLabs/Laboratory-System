@@ -136,9 +136,18 @@
     $('#registerForm').submit(function(event) {
         event.preventDefault();
         var formData = $(this).serialize();
-        $.post('/register', formData, function(response) {
-            alert(response.message);
-            $('#registerModal').modal('hide');
+        $.ajax({
+            type: 'POST',
+            url: 'Client/register',
+            data: formData,
+            success: function(response) {
+                alert('Registration successful!');
+                $('#registerModal').modal('hide');
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert('Registration failed. Please try again.');
+            }
         });
     });
 </script>

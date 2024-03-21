@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.sql.Timestamp;
 import java.util.Date;
 
-@Document(collection = "clients")
+@Document(collection = "client")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

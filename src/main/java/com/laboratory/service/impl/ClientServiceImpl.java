@@ -28,12 +28,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client loginClient(String email, String password) {
-        return clientRepository.findByUsernameAndPassword(email, password);
+        //return clientRepository.findByUsernameAndPassword(email, password);
+        return null;
     }
 
     @Override
     public Client loginClientWithRole(String email, String password, String role) {
-        return clientRepository.findByUsernameAndRole(email, role);
+        //return clientRepository.findByUsernameAndRole(email, role);
+        return null;
     }
 
     @Override

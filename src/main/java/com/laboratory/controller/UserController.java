@@ -7,6 +7,7 @@
 
 package com.laboratory.controller;
 
+import com.laboratory.model.bean.ResponseBean;
 import com.laboratory.model.entity.User;
 import com.laboratory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,48 +21,55 @@ import java.util.List;
 @RequestMapping("/api")
 public class UserController {
 
+    ResponseBean responseBean = new ResponseBean();
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseBean registerUser(@RequestBody User user) {
         // Perform user registration
-        User registeredUser = userService.registerUser(user);
-        if (registeredUser != null) {
-            return ResponseEntity.ok().body("User registered successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to register user");
+        try {
+            User registeredUser = userService.registerUser(user);
+            if (registeredUser != null) {
+                responseBean.setContent(registeredUser);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("User registered successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("User with ID already exists in the database");
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Failed to register user");
         }
+        return responseBean;
     }
 
-    // Class for response with redirect URL
-    private static class RedirectResponse {
-        private String redirectUrl;
+    @PostMapping("/user/login/{username}/{password}")
+    public ResponseBean loginUser(@PathVariable String username, @PathVariable String password) {
+        try {
+            User usersByUsernameAndPassword = userService.getUsersByUsernameAndPassword(username, password);
 
-        public RedirectResponse(String redirectUrl) {
-            this.redirectUrl = redirectUrl;
-        }
+            if (usersByUsernameAndPassword != null) {
+                String role = String.valueOf(usersByUsernameAndPassword.getRole()); // Assuming getRole() method returns user's role
+                String redirectUrl = determineRedirectUrl(role);
 
-        public String getRedirectUrl() {
-            return redirectUrl;
+                responseBean.setContent(redirectUrl);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("User logged in successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Invalid username or password");
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Internal Server Error");
         }
-
-        public void setRedirectUrl(String redirectUrl) {
-            this.redirectUrl = redirectUrl;
-        }
-    }
-
-    @PostMapping("/user/login")
-    public ResponseEntity<String> loginUser(@RequestParam String username, @RequestParam String password) {
-        // Validate the user's credentials and retrieve their role
-        User user = userService.loginUser(username, password);
-        if (user != null) {
-            String role = String.valueOf(user.getRole()); // Assuming getRole() method returns user's role
-            String redirectUrl = determineRedirectUrl(role);
-            return ResponseEntity.ok().body(redirectUrl);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
+        return responseBean;
     }
 
     private String determineRedirectUrl(String role) {
@@ -75,28 +83,87 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user/loginWithRole")
-    public User loginUserWithRole(@RequestParam String username, @RequestParam String password, @RequestParam String role) {
-        return userService.loginUserWithRole(username, password, role);
-    }
-
     @PutMapping("/user/{id}")
-    public User updateUser(@PathVariable String id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public ResponseBean updateUser(@PathVariable String id, @RequestBody User user) {
+        try {
+            User user1 = userService.updateUser(id, user);
+            if (user1 != null) {
+                responseBean.setContent(user1);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("User update successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Invalid User " + id);
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("User update unsuccessfully");
+        }
+        return responseBean;
     }
 
     @DeleteMapping("/user/{id}")
-    public void deleteUser(@PathVariable String id) {
-        userService.deleteUser(id);
+    public ResponseBean deleteUser(@PathVariable String id) {
+        try {
+            int i = userService.deleteUser(id);
+            if (i == 1) {
+                responseBean.setContent(id);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("User delete successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("User delete unsuccessfully");
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("User delete unsuccessfully");
+        }
+        return responseBean;
     }
 
     @GetMapping("/user/{id}")
-    public User getUserById(@PathVariable String id) {
-        return userService.getUserById(id);
+    public ResponseBean getUserById(@PathVariable String id) {
+        try {
+            User userById = userService.getUserById(id);
+            if (userById != null) {
+                responseBean.setContent(userById);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Get user "+ id +" successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Invalid User " + id);
+            }
+        } catch (Exception e) {
+            responseBean.setContent(null);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Get user "+ id +" unsuccessfully");
+        }
+        return responseBean;
     }
 
     @GetMapping("/user/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseBean getAllUsers() {
+        try {
+            List<User> allUsers = userService.getAllUsers();
+            if (allUsers.size() >0 ){
+                responseBean.setContent(allUsers);
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Get all users fetch successfully");
+            } else {
+                responseBean.setContent(allUsers);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("No users in the database");
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Get all users fetch unsuccessfully");
+        }
+        return responseBean;
     }
 }

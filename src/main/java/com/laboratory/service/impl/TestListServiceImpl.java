@@ -7,13 +7,17 @@
 
 package com.laboratory.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laboratory.Repository.TestListRepository;
 import com.laboratory.model.entity.TestList;
 import com.laboratory.service.TestListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TestListServiceImpl implements TestListService {
@@ -23,7 +27,15 @@ public class TestListServiceImpl implements TestListService {
 
     @Override
     public TestList createTestList(TestList testList) {
-        return testListRepository.save(testList);
+        Optional<TestList> existingTest = testListRepository.findById(testList.getId());
+        TestList saveTest = null;
+        if (existingTest.isPresent()) {
+            System.out.println("User with ID " + testList.getId() + " already exists in the database.");
+        } else {
+            saveTest = testListRepository.save(testList);
+            System.out.println("User with ID " + testList.getId() + " has been added to the database.");
+        }
+        return saveTest;
     }
 
     @Override
@@ -52,12 +64,34 @@ public class TestListServiceImpl implements TestListService {
     }
 
     @Override
-    public void deleteTestList(String id) {
-        testListRepository.deleteById(id);
+    public int deleteTestList(String id) {
+        Optional<TestList> byId = testListRepository.findById(id);
+
+        if (byId.isPresent()) {
+            testListRepository.deleteById(id);
+            return 1; // User deleted successfully
+        } else {
+            return 0; // User does not exist, no deletion performed
+        }
     }
 
     @Override
     public String getDescriptionById(String id) {
-        return testListRepository.findDescriptionById(id);
+        String jsonString = testListRepository.findDescriptionById(id);
+
+        try {
+            // Parse the JSON string
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+            // Extract the value of the "description" field
+            String description = jsonNode.get("description").asText();
+
+            return description;
+        } catch (IOException e) {
+            // Handle parsing errors
+            e.printStackTrace(); // Log the error or handle it as needed
+            return null;
+        }
     }
 }

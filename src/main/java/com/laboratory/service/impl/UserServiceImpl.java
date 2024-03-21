@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,7 +24,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(User user) {
-        return userRepository.save(user);
+        Optional<User> existingUser = userRepository.findById(user.getId());
+        User saveUser = null;
+        if (existingUser.isPresent()) {
+            System.out.println("User with ID " + user.getId() + " already exists in the database.");
+        } else {
+            saveUser = userRepository.save(user);
+            System.out.println("User with ID " + user.getId() + " has been added to the database.");
+        }
+        return saveUser;
     }
 
     @Override
@@ -38,8 +47,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(String id, User user) {
-        User existingUser = userRepository.findById(id).orElse(null);
-        if (existingUser != null) {
+        Optional<User> byIdOptional = userRepository.findById(id);
+
+        if (byIdOptional.isPresent()) {
+            User existingUser = byIdOptional.get();
+            // Update only the fields that are not the ID
             existingUser.setFirstname(user.getFirstname());
             existingUser.setMiddlename(user.getMiddlename());
             existingUser.setLastname(user.getLastname());
@@ -49,22 +61,41 @@ public class UserServiceImpl implements UserService {
             // Set other fields as needed
             return userRepository.save(existingUser);
         } else {
-            return null; // or throw an exception if the user with given id is not found
+            return null; // or throw an exception if the user with the given id is not found
         }
     }
 
     @Override
-    public void deleteUser(String id) {
-        userRepository.deleteById(id);
+    public int deleteUser(String id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            userRepository.deleteById(id);
+            return 1; // User deleted successfully
+        } else {
+            return 0; // User does not exist, no deletion performed
+        }
     }
 
     @Override
     public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
+        Optional<User> byId = userRepository.findById(id);
+
+        if (byId.isPresent()) {
+            return byId.get(); // Return the user inside the Optional
+        } else {
+            return null; // Or throw an exception or handle the case according to your application logic
+        }
     }
 
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public User getUsersByUsernameAndPassword(String username, String password) {
+        User byUsernameAndPassword = userRepository.findByUsernameAndPassword(username, password);
+        return byUsernameAndPassword;
     }
 }
