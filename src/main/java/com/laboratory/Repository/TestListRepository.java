@@ -20,4 +20,6 @@ public interface TestListRepository extends MongoRepository<TestList, String> {
 
         @Query(value = "{'id': ?0}", fields = "{'description' : 1}")
         String findDescriptionById(String id);
+
+        long count();
 }

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Test List</h4>
+        </div>
+        <div class="col-md-6 text-right">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addTestModal">+ Add New Test</button>
+        </div>
+    </div>
+    <br>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date Created</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="testListTableBody">
+        <!-- Table rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal for Adding New Test -->
+<div class="modal fade" id="addTestModal" tabindex="-1" role="dialog" aria-labelledby="addTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTestModalLabel">Add New Test</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to add new test -->
+                <form id="addTestForm">
+                    <div class="form-group">
+                        <label for="testID">ID</label>
+                        <input type="text" class="form-control" id="testID" placeholder="Enter test ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="testName">Name</label>
+                        <input type="text" class="form-control" id="testName" placeholder="Enter test name">
+                    </div>
+                    <div class="form-group">
+                        <label for="testDescription">Description</label>
+                        <input type="text" class="form-control" id="testDescription" placeholder="Enter test description">
+                    </div>
+                    <div class="form-group">
+                        <label for="testCreateDate">Create Date</label>
+                        <input type="date" class="form-control" id="testCreateDate" placeholder="Enter test description">
+                    </div>
+                    <div class="form-group">
+                        <label for="testStatus">Status</label>
+                        <select class="form-control" id="testStatus">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="testCost">Cost</label>
+                        <input type="number" class="form-control" id="testCost" placeholder="Enter test cost">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Tests -->
+<div class="modal fade" id="editTestModal" tabindex="-1" role="dialog" aria-labelledby="editTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTestModalLabel">Edit Test</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to edit test -->
+                <form id="editTestForm">
+                    <input type="hidden" id="editTestId">
+                    <div class="form-group">
+                        <label for="editTestName">Name</label>
+                        <input type="text" class="form-control" id="editTestName" placeholder="Enter test name">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTestDescription">Description</label>
+                        <input type="text" class="form-control" id="editTestDescription" placeholder="Enter test description">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTestCreateDate">Create Date</label>
+                        <input type="date" class="form-control" id="editTestCreateDate" placeholder="Enter test description">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTestStatus">Status</label>
+                        <select class="form-control" id="editTestStatus">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTestCost">Cost</label>
+                        <input type="number" class="form-control" id="editTestCost" placeholder="Enter test cost">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (optional, for some features) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Function to fetch test lists and populate the table
+        function fetchTestLists() {
+            $.get("http://localhost:8085/api/test-lists")
+                .done(function(response) {
+                    console.log("Received data:", response); // Log received data
+                    // Clear existing table rows
+                    $("#testListTableBody").empty();
+
+                    // Iterate over fetched test lists and populate the table
+                    $.each(response.content, function(index, testList) {
+                        var row = "<tr>" +
+                            "<td>" + testList.id + "</td>" +
+                            "<td>" + testList.createDate + "</td>" +
+                            "<td>" + testList.name + "</td>" +
+                            "<td>" + testList.cost + "</td>" +
+                            "<td>" + testList.status + "</td>" +
+                            "<td>" +
+                            "<button class='btn btn-primary btn-view' style='margin-right: 10px;' data-id='" + testList.id + "'>View</button>" +
+                            "<button class='btn btn-warning btn-edit' style='margin-right: 10px;' data-id='" + testList.id + "'>Edit</button>" +
+                            "<button class='btn btn-danger btn-delete' data-id='" + testList.id + "'>Delete</button>" +
+                            "</td>" +
+                            "</tr>";
+
+                        $("#testListTableBody").append(row);
+                    });
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("Error fetching data:", error); // Log error
+                    // Optionally, you can display an error message to the user
+                });
+        }
+
+        // Call the fetchTestLists function when the page is loaded
+        fetchTestLists();
+
+        // Click event handler for delete button
+        $('#testListTableBody').on('click', '.btn-delete', function() {
+            var testId = $(this).data('id');
+            // Send AJAX request to delete endpoint
+            $.ajax({
+                type: 'DELETE',
+                url: 'http://localhost:8085/api/test-list/' + testId,
+                success: function (response) {
+                    // Handle success response
+                    alert('Test deleted successfully');
+                    fetchTestLists(); // Refresh the table
+                },
+                error: function (xhr, status, error) {
+                    // Handle error response
+                    alert('Error: ' + error);
+                }
+            });
+        });
+
+        // Click event handler for edit button
+        $('#testListTableBody').on('click', '.btn-edit', function() {
+            var testId = $(this).data('id');
+            // Send AJAX request to fetch test details
+            $.ajax({
+                type: 'GET',
+                url: 'http://localhost:8085/api/test-list/' + testId,
+                success: function (response) {
+                    // Populate edit form with test details
+                    $('#editTestId').val(response.id);
+                    $('#editTestName').val(response.name);
+                    $('#editTestDescription').val(response.description);
+                    $('#editTestCreateDate').val(response.createDate.substring(0, 10)); // Extract date part only
+                    $('#editTestStatus').val(response.status);
+                    $('#editTestCost').val(response.cost);
+
+                    // Show edit test modal
+                    $('#editTestModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    // Handle error response
+                    alert('Error: ' + error);
+                }
+            });
+        });
+
+    });
+
+    // Submit event handler for add test form
+    $('#addTestForm').submit(function (event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Collect form data
+        var formData = {
+            id: $('#testID').val(),
+            name: $('#testName').val(),
+            description: $('#testDescription').val(),
+            createDate: $('#testCreateDate').val(),
+            status: $('#testStatus').val(),
+            cost: $('#testCost').val()
+        };
+
+        // Send AJAX request to Java controller
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: 'http://localhost:8085/api/test-list/create', // Your controller endpoint URL
+            data: JSON.stringify(formData),
+            success: function (response) {
+                // Handle success response
+                alert('Test created successfully');
+                fetchTestLists(); // Refresh the table
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                alert('Error: ' + error);
+            }
+        });
+    });
+
+    // Submit event handler for edit test form
+    $('#editTestForm').submit(function (event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Collect form data
+        var formData = {
+            id: $('#editTestId').val(),
+            name: $('#editTestName').val(),
+            description: $('#editTestDescription').val(),
+            createDate: $('#editTestCreateDate').val(),
+            status: $('#editTestStatus').val(),
+            cost: $('#editTestCost').val()
+        };
+
+        // Send AJAX request to update test details
+        $.ajax({
+            type: 'PUT',
+            contentType: 'application/json',
+            url: 'http://localhost:8085/api/test-list/update/' + formData.id,
+            data: JSON.stringify(formData),
+            success: function (response) {
+                // Handle success response
+                alert('Test updated successfully');
+                $('#editTestModal').modal('hide'); // Hide edit modal
+                fetchTestLists(); // Refresh the table
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                alert('Error: ' + error);
+            }
+        });
+    });
+</script>
+</body>
+</html>

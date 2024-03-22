@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class TestListController {
 
     @Autowired
@@ -147,6 +148,27 @@ public class TestListController {
             responseBean.setContent(e);
             responseBean.setResponseCode("500");
             responseBean.setResponseMsg("Test description fetch unsuccessfully");
+        }
+        return responseBean;
+    }
+
+    @GetMapping("/test-count")
+    public ResponseBean getTitalCount() {
+        try {
+            long count = testListService.totalCount();
+            if (count > 0) {
+                responseBean.setContent(String.valueOf(count));
+                responseBean.setResponseCode("200");
+                responseBean.setResponseMsg("Total Test fetch successfully");
+            } else {
+                responseBean.setContent(null);
+                responseBean.setResponseCode("300");
+                responseBean.setResponseMsg("Not able Test count");
+            }
+        } catch (Exception e) {
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("otal Test fetch unsuccessfully");
         }
         return responseBean;
     }

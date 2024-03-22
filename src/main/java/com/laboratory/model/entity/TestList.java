@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
+
 @Document(collection = "test_list")
 @Data
 @NoArgsConstructor
@@ -24,4 +27,5 @@ public class TestList {
     private String description;
     private String status;
     private double cost;
+    private Date createDate;
 }

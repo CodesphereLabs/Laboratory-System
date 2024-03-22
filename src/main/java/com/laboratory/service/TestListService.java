@@ -18,4 +18,6 @@ public interface TestListService {
     TestList updateTestList(String id, TestList testList);
     int deleteTestList(String id);
     String getDescriptionById(String id);
+
+    long totalCount();
 }

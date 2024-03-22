@@ -94,4 +94,9 @@ public class TestListServiceImpl implements TestListService {
             return null;
         }
     }
+
+    @Override
+    public long totalCount() {
+        return testListRepository.count();
+    }
 }

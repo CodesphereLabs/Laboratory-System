@@ -12,13 +12,12 @@ import com.laboratory.model.entity.Client;
 import com.laboratory.model.entity.User;
 import com.laboratory.service.ClientService;
 import com.laboratory.service.UserService;
+import com.laboratory.util.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -55,66 +54,10 @@ public class UserController {
         return responseBean;
     }
 
-    @PostMapping("/user/login/{username}/{password}")
-    public ResponseEntity<ResponseBean> loginUser(@PathVariable String username, @PathVariable String password) {
-        ResponseBean responseBean = new ResponseBean();
-        try {
-            User userUserRole = userService.getUsersByUsernameAndPassword(username, password);
-            Client clientUserRole = clientService.getUsersByUsernameAndPassword(username, password);
-
-            if (userUserRole != null) {
-                String role = String.valueOf(userUserRole.getRole());
-                String redirectUrl = determineRedirectUrl(role);
-                responseBean.setContent(redirectUrl);
-                responseBean.setResponseCode("200");
-                responseBean.setResponseMsg("User logged in successfully");
-            } else if (clientUserRole != null) {
-                // Load the HTML content of client_dashboard.html
-                String clientDashboardHtml = loadClientDashboardHtml(); // Load the HTML content
-                responseBean.setContent(clientDashboardHtml);
-                responseBean.setResponseCode("200");
-                responseBean.setResponseMsg("User logged in successfully");
-            } else {
-                responseBean.setResponseCode("300");
-                responseBean.setResponseMsg("Invalid username or password");
-            }
-        } catch (Exception e) {
-            responseBean.setResponseCode("500");
-            responseBean.setResponseMsg("Internal Server Error");
-        }
-        return ResponseEntity.ok().body(responseBean);
-    }
-
-    private String loadClientDashboardHtml() {
-        StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("./templates/client_dashboard.html"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                contentBuilder.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle file reading errors appropriately
-            return "<html><body><h1>Error loading client dashboard</h1></body></html>";
-        }
-        return contentBuilder.toString();
-    }
-
-    private String determineRedirectUrl(String role) {
-        // Determine the redirect URL based on the user's role
-        if ("admin".equals(role)) {
-            return "/admin_dashboard.html"; // Redirect to admin dashboard
-        } else if ("client".equals(role)) {
-            return "/client_dashboard.html"; // Redirect to user dashboard
-        } else {
-            return "/login.html"; // Redirect to login page in case of unknown role
-        }
-    }
-
-
+//    @PostMapping("/user/login/{username}/{password}")
 //    public ResponseBean loginUser(@PathVariable String username, @PathVariable String password) {
 //        try {
 //            User userUserRole = userService.getUsersByUsernameAndPassword(username, password);
-//            Client clientUserRole = clientService.getUsersByUsernameAndPassword(username, password);
 //
 //            if (userUserRole != null) {
 //                String role = String.valueOf(userUserRole.getRole()); // Assuming getRole() method returns user's role
@@ -142,6 +85,34 @@ public class UserController {
 //        }
 //        return responseBean;
 //    }
+
+    @PostMapping("/user/login/{username}/{password}")
+    public ResponseEntity<String> loginUser(@PathVariable String username, @PathVariable String password) {
+        try {
+            User user = userService.getUsersByUsernameAndPassword(username, password);
+            Client client = clientService.getUsersByUsernameAndPassword(username, password);
+
+            if (user != null) {
+                return ResponseEntity.ok("redirect:/admin_dashboard"); // Redirect to admin dashboard
+            } else if (client != null) {
+                return ResponseEntity.ok("redirect:/client_dashboard"); // Redirect to user dashboard
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
+
+    private String determineRedirectUrl(UserRole role) {
+        if (UserRole.ADMIN.equals(role)) {
+            return "/admin_dashboard.html"; // Redirect to admin dashboard
+        } else if (UserRole.CLIENT.equals(role)) {
+            return "/client_dashboard.html"; // Redirect to user dashboard
+        } else {
+            return "/login.html"; // Redirect to login page in case of unknown role
+        }
+    }
 
     @PutMapping("/user/{id}")
     public ResponseBean updateUser(@PathVariable String id, @RequestBody User user) {
