@@ -14,4 +14,6 @@ import java.sql.Timestamp;
 
 public interface AppointmentService {
     AppointmentList createAppointment(String clientId, int testListId, Timestamp schedule, String prescriptionPath);
+
+    AppointmentList saveAppointment(AppointmentList appointmentList);
 }

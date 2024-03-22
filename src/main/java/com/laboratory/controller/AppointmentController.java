@@ -7,25 +7,26 @@
 
 package com.laboratory.controller;
 
+import com.laboratory.model.bean.ResponseBean;
 import com.laboratory.model.entity.AppointmentList;
 import com.laboratory.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class AppointmentController {
 
     @Autowired
     private AppointmentService appointmentService;
 
-    @PostMapping("/create")
-    public AppointmentList createAppointment(@RequestBody AppointmentList appointmentRequest) {
+    ResponseBean responseBean = new ResponseBean();
+
+    @PostMapping("/appointments/create")
+    public ResponseBean createAppointment(@RequestBody AppointmentList appointmentRequest) {
         AppointmentList appointment = new AppointmentList();
         //Authentication authentication = null;
         String clientId = null;
@@ -36,11 +37,19 @@ public class AppointmentController {
             Timestamp schedule = appointmentRequest.getSchedule();
             String prescriptionPath = appointmentRequest.getPrescriptionPath();
             int testListId = appointmentRequest.getStatus();
-            appointment = appointmentService.createAppointment(clientId, testListId, schedule, prescriptionPath);
+            //appointment = appointmentService.createAppointment(clientId, testListId, schedule, prescriptionPath);
+
+            AppointmentList appointmentList = appointmentService.saveAppointment(appointment);
+
+            responseBean.setContent(appointmentList);
+            responseBean.setResponseCode("200");
+            responseBean.setResponseMsg("Client registered successfully");
         } catch (Exception e) {
-            System.out.println(e);
+            responseBean.setContent(e);
+            responseBean.setResponseCode("500");
+            responseBean.setResponseMsg("Failed to register Client");
         }
-        return appointment;
+        return responseBean;
     }
 }
 

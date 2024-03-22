@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 0 auto;
+        }
+        .box {
+            width: calc(25% - 20px); /* 4 columns per row, subtracting margin */
+            height: 100px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative; /* Position relative for absolute positioning of icon */
+            text-align: center;
+            display: flex; /* Added to use flexbox for centering */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+        .box .icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 10px;
+        }
+        .box .text-container {
+            margin-left: 40px; /* Adjusted margin to shift text to the right */
+            text-align: left; /* Align text to the left */
+        }
+        .box .icon i {
+            font-size: 36px; /* Adjust the icon size as needed */
+        }
+
+        @media (max-width: 992px) {
+            .box {
+                width: calc(50% - 20px); /* 2 columns per row for smaller screens */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .box {
+                width: 100%; /* 1 column per row for mobile screens */
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="box">
+        <span class="icon"><i class="fas fa-flask fa-3x"></i></span>
+        <div class="text-container">
+            <h6>Tests</h6>
+            <p id="testsCount">Loading...</p>
+        </div>
+    </div>
+    <div class="box">
+        <span class="icon"><i class="fas fa-calendar-check fa-3x"></i></span>
+        <div class="text-container">
+            <h6>Booked Appointment</h6>
+            <p>11</p>
+        </div>
+    </div>
+    <div class="box">
+        <span class="icon"><i class="fas fa-hourglass-half fa-3x"></i></span>
+        <div class="text-container">
+            <h6>Pending Appointment</h6>
+            <p>05</p>
+        </div>
+    </div>
+    <div class="box">
+        <span class="icon"><i class="fas fa-check-circle fa-3x"></i></span>
+        <div class="text-container">
+            <h6>Approved Appointment</h6>
+            <p>11</p>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Fetch test count from the endpoint
+        $.ajax({
+            url: "http://localhost:8085/api/test-count",
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                // Ensure the response contains the count
+                if (response && response.content !== undefined) {
+                    // Update the <p> element with the count
+                    $('#testsCount').text(response.content); // Assuming content is an array with a single element
+                } else {
+                    // If the response doesn't contain the count, display an error message
+                    $('#testsCount').text("Error: Invalid response");
+                }
+            },
+            error: function(xhr, status, error) {
+                // If an error occurs during the AJAX request, display an error message
+                $('#testsCount').text("Error: " + error);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
